@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,30 +30,27 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import me.inflowsolutions.muzzexercise.ui.GradientIconButton
-import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
 import me.inflowsolutions.muzzexercise.ui.theme.Beige
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
+import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
 import me.inflowsolutions.muzzexercise.ui.theme.Pink
 
 class ChatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val messages = listOf(
-            Message("User", "Hello!"),
-            Message("Friend", "Hi, how are you?"),
-            Message("User", "I'm good, thanks! What about you?"),
-            Message("Friend", "I'm doing well, thank you.")
-        )
         setContent {
             MuzzExerciseTheme {
                 // A surface container using the 'background' color from the theme
@@ -63,20 +58,20 @@ class ChatActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ChatScreen(messages)
+                    ChatScreen()
                 }
             }
         }
     }
 }
 
-data class Message(val sender: String, val content: String)
-
 @Composable
-fun ChatScreen(messages: List<Message>) {
+fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
+    val messages by viewModel.getMessages().collectAsState()
+
     Column {
-        MessageList(messages, modifier = Modifier.weight(1f))
-        MessageInputField()
+        MessageList(messages.asReversed(), modifier = Modifier.weight(1f))
+        MessageInputField { viewModel.onMessageSent(it) }
     }
 }
 
@@ -153,7 +148,9 @@ fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MessageInputField() {
+fun MessageInputField(onSendClick: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+
     Card(elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -161,9 +158,19 @@ fun MessageInputField() {
                 .background(color = Color.White)
                 .padding(16.dp)
         ) {
-            OutlinedTextField(value = "test", onValueChange = {}, shape = CircleShape)
+            OutlinedTextField(
+                shape = CircleShape,
+                placeholder = {
+                    Text("Type your message here")
+                },
+                value = text,
+                onValueChange = { text = it },
+            )
             Spacer(Modifier.width(32.dp))
-            SendButton({ /* TODO: Send */ })
+            SendButton({
+                onSendClick(text)
+                text = ""
+            })
         }
     }
 }
@@ -185,13 +192,7 @@ fun SendButton(
 @Preview(showBackground = true)
 @Composable
 fun ChatScreenPreview() {
-    val messages = listOf(
-        Message("User", "Hello!"),
-        Message("Friend", "Hi, how are you?"),
-        Message("User", "I'm good, thanks! What about you?"),
-        Message("Friend", "I'm doing well, thank you.")
-    )
     MuzzExerciseTheme {
-        ChatScreen(messages = messages)
+        ChatScreen()
     }
 }
