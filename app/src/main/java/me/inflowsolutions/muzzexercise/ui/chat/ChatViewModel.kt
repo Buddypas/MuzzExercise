@@ -25,4 +25,8 @@ class ChatViewModel : ViewModel() {
             messages.value = it
         }
     }
+
+    fun onBackClick() {
+        // TODO: Switch user
+    }
 }
