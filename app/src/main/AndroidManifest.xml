@@ -12,7 +12,7 @@
         android:theme="@style/Theme.MuzzExercise"
         tools:targetApi="31">
         <activity
-            android:name=".ChatActivity"
+            android:name=".ui.chat.ChatActivity"
             android:label="@string/title_activity_chat"
             android:theme="@style/Theme.MuzzExercise"
             android:exported="true">

@@ -1,4 +1,4 @@
-package me.inflowsolutions.muzzexercise
+package me.inflowsolutions.muzzexercise.ui.chat
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,6 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Scaffold
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
@@ -38,10 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import me.inflowsolutions.muzzexercise.Message
 import me.inflowsolutions.muzzexercise.ui.GradientIconButton
 import me.inflowsolutions.muzzexercise.ui.theme.Beige
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
@@ -53,13 +58,7 @@ class ChatActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MuzzExerciseTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ChatScreen()
-                }
+                ChatScreen()
             }
         }
     }
@@ -69,9 +68,24 @@ class ChatActivity : ComponentActivity() {
 fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
     val messages by viewModel.getMessages().collectAsState()
 
-    Column {
-        MessageList(messages.asReversed(), modifier = Modifier.weight(1f))
-        MessageInputField { viewModel.onMessageSent(it) }
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Sarah") })
+        }
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(modifier = Modifier.padding(it)) {
+                MessageList(messages.asReversed(), modifier = Modifier.weight(1f))
+                MessageInputField { messageText ->
+                    viewModel.onMessageSent(messageText)
+                }
+            }
+        }
     }
 }
 
@@ -149,7 +163,7 @@ fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
 
 @Composable
 fun MessageInputField(onSendClick: (String) -> Unit) {
-    var text by remember { mutableStateOf("") }
+    var fieldText by remember { mutableStateOf("") }
 
     Card(elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)) {
         Row(
@@ -159,17 +173,24 @@ fun MessageInputField(onSendClick: (String) -> Unit) {
                 .padding(16.dp)
         ) {
             OutlinedTextField(
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+
                 shape = CircleShape,
                 placeholder = {
-                    Text("Type your message here")
+                    // TODO: Add material colors
+                    Text(
+                        "Type your message here",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = DarkGray)
+                    )
                 },
-                value = text,
-                onValueChange = { text = it },
+                value = fieldText,
+                onValueChange = { fieldText = it },
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
             Spacer(Modifier.width(32.dp))
             SendButton({
-                onSendClick(text)
-                text = ""
+                onSendClick(fieldText)
+                fieldText = ""
             })
         }
     }
