@@ -13,8 +13,11 @@ import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
 import me.inflowsolutions.muzzexercise.data.db.dao.MessagesDao
 import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
 import me.inflowsolutions.muzzexercise.data.db.mapper.MessageDtoToMessageMapper
+import me.inflowsolutions.muzzexercise.data.db.mapper.UserDtoToUserMapper
 import me.inflowsolutions.muzzexercise.data.repository.MessageRepositoryImpl
+import me.inflowsolutions.muzzexercise.data.repository.UserRepositoryImpl
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
+import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -47,6 +50,14 @@ object DataModule {
         database: MuzzExerciseDatabase,
         messageDtoMapper: MessageDtoToMessageMapper
     ): MessageRepository = MessageRepositoryImpl(database, messageDtoMapper)
+
+    @Singleton
+    @Provides
+    fun provideUserRepository(
+        database: MuzzExerciseDatabase,
+        userDtoMapper: UserDtoToUserMapper,
+        @ApplicationScope applicationScope: CoroutineScope,
+    ): UserRepository = UserRepositoryImpl(database, userDtoMapper, applicationScope)
 
     @ApplicationScope
     @Provides

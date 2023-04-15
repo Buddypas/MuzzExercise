@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.inflowsolutions.muzzexercise.data.db.mapper.MessageDtoToMessageMapper
+import me.inflowsolutions.muzzexercise.data.db.mapper.UserDtoToUserMapper
 import javax.inject.Singleton
 
 @Module
@@ -13,4 +14,8 @@ object MapperModule {
     @Provides
     @Singleton
     fun provideMessageDtoToMessageMapper(): MessageDtoToMessageMapper = MessageDtoToMessageMapper()
+
+    @Provides
+    @Singleton
+    fun provideUserDtoToUserMapper(): UserDtoToUserMapper = UserDtoToUserMapper()
 }

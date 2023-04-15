@@ -13,8 +13,7 @@ import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class MessageRepositoryImpl @Inject constructor(
+class MessageRepositoryImpl(
     private val db: MuzzExerciseDatabase,
     private val messageDtoMapper: MessageDtoToMessageMapper,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
