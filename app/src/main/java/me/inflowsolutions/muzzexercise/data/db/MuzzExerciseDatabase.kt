@@ -17,7 +17,6 @@ import javax.inject.Provider
 @Database(entities = [UserDto::class, MessageDto::class], version = 1, exportSchema = false)
 //@TypeConverters(Converters::class)
 abstract class MuzzExerciseDatabase : RoomDatabase() {
-
     abstract fun usersDao(): UsersDao
     abstract fun messagesDao(): MessagesDao
 
@@ -28,13 +27,10 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-
-            val usersDao = database.get().usersDao()
-
             applicationScope.launch {
-                usersDao.insertAll(
-                    UserDto(name = "Sarah"),
+                database.get().usersDao().insertAll(
                     UserDto(name = "John"),
+                    UserDto(name = "Sarah"),
                 )
             }
         }

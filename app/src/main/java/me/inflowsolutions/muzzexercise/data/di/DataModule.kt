@@ -12,6 +12,9 @@ import kotlinx.coroutines.SupervisorJob
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
 import me.inflowsolutions.muzzexercise.data.db.dao.MessagesDao
 import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
+import me.inflowsolutions.muzzexercise.data.db.mapper.MessageDtoToMessageMapper
+import me.inflowsolutions.muzzexercise.data.repository.MessageRepositoryImpl
+import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -37,6 +40,13 @@ object DataModule {
     @Provides
     fun provideMessagesDao(database: MuzzExerciseDatabase): MessagesDao =
         database.messagesDao()
+
+    @Singleton
+    @Provides
+    fun provideMessageRepository(
+        database: MuzzExerciseDatabase,
+        messageDtoMapper: MessageDtoToMessageMapper
+    ): MessageRepository = MessageRepositoryImpl(database, messageDtoMapper)
 
     @ApplicationScope
     @Provides

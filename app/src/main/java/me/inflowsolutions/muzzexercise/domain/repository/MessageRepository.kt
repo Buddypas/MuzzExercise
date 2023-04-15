@@ -5,4 +5,6 @@ import me.inflowsolutions.muzzexercise.domain.model.Message
 
 interface MessageRepository {
     fun getAllMessages(): Flow<List<Message>>
+
+    suspend fun sendMessage(message: Message)
 }

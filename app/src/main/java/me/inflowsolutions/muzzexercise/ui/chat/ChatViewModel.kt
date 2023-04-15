@@ -1,28 +1,47 @@
 package me.inflowsolutions.muzzexercise.ui.chat
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import me.inflowsolutions.muzzexercise.Message
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import me.inflowsolutions.muzzexercise.domain.model.Message
+import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
+import timber.log.Timber
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(private val messageRepository: MessageRepository) : ViewModel() {
     private val messages = MutableStateFlow<List<Message>>(emptyList())
     fun getMessages(): StateFlow<List<Message>> = messages.asStateFlow()
 
     init {
-        messages.value = listOf(
-            Message("User", "Hello!"),
-            Message("Friend", "Hi, how are you?"),
-            Message("User", "I'm good, thanks! What about you?"),
-            Message("Friend", "I'm doing well, thank you.")
-        )
+        viewModelScope.launch {
+            messageRepository.getAllMessages().collectLatest {
+                messages.value = it
+            }
+        }
     }
 
-    fun onMessageSent(text: String) {
-        messages.value.toMutableList().also {
-            it.add(Message("User", text))
-            messages.value = it
+    // TODO: Validate text
+    fun onSendClick(text: String) {
+        viewModelScope.launch {
+            runCatching {
+                Message(
+                    content = text,
+                    senderId = 0,
+                    sentAt = Clock.System.now()
+                )
+            }.mapCatching { message ->
+                messageRepository.sendMessage(message)
+            }.onSuccess {
+                Timber.d("0--> message sent")
+            }
         }
     }
 

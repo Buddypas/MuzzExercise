@@ -17,14 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Card
@@ -47,16 +45,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import me.inflowsolutions.muzzexercise.Message
+import dagger.hilt.android.AndroidEntryPoint
+import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.ui.GradientIconButton
 import me.inflowsolutions.muzzexercise.ui.theme.Beige
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
 import me.inflowsolutions.muzzexercise.ui.theme.Pink
 
+@AndroidEntryPoint
 class ChatActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +102,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
             Column(modifier = Modifier.padding(it)) {
                 MessageList(messages.asReversed(), modifier = Modifier.weight(1f))
                 MessageInputField { messageText ->
-                    viewModel.onMessageSent(messageText)
+                    viewModel.onSendClick(messageText)
                 }
             }
         }
@@ -155,8 +156,8 @@ fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
                 .padding(horizontal = 32.dp, vertical = 24.dp),
             reverseLayout = true
         ) {
-            items(messages) { message ->
-                val isUserMessage = message.sender == "User"
+            items(items = messages, key = { message -> message.id ?: 0 }) { message ->
+                val isUserMessage = message.senderId == 0
                 Row(modifier = modifier.fillMaxWidth()) {
                     if (isUserMessage) {
                         Spacer(Modifier.weight(1f))
