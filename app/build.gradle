@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -48,14 +49,7 @@ android {
 }
 
 dependencies {
-    def coreVersion = '1.9.0'
-    def appCompatVersion = '1.6.1'
-    def materialVersion = '1.8.0'
-    def timberVersion = '5.0.1'
-    def coroutinesVersion = '1.6.4'
-    def composeLifecycleVersion = '2.6.1'
-    def composeActivityVersion = '1.7.0'
-    def composeMaterialVersion = '1.4.0'
+
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
     implementation "androidx.core:core-ktx:$coreVersion"
@@ -64,20 +58,28 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$composeLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$composeLifecycleVersion"
     implementation "androidx.activity:activity-compose:$composeActivityVersion"
-    implementation "androidx.compose.ui:ui:$compose_ui_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation "androidx.compose.material:material:$composeMaterialVersion"
+    implementation "androidx.compose.ui:ui:$composeUiVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeUiVersion"
+    implementation "androidx.compose.material:material:$composeUiVersion"
 
     // Room
-    implementation "androidx.room:room-runtime:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
+    // Hilt
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
+    
+    // Kotlinx Datetime
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetimeVersion"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeUiVersion"
+    debugImplementation "androidx.compose.ui:ui-tooling:$composeUiVersion"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$composeUiVersion"
+    // TODO: extract
     implementation 'androidx.compose.material3:material3:1.1.0-beta02'
 }
