@@ -2,6 +2,7 @@ package me.inflowsolutions.muzzexercise.ui.chat
 
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -28,7 +30,9 @@ class ChatViewModel @Inject constructor(
     override val viewModelStateFlow = MutableStateFlow(ChatState())
     override val uiStateFlow: StateFlow<ChatUiState> by lazy {
         viewModelStateFlow
-            .map { it.toUiState() }
+            .map {
+                it.toUiState()
+            }
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -49,7 +53,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    override fun ChatState.toUiState(): ChatUiState =
+    override suspend fun ChatState.toUiState(): ChatUiState =
         ChatUiState(
             recipientName = recipientUser?.name.orEmpty(),
             recipientImageUrl = recipientUser?.imageUrl.orEmpty(),
@@ -104,28 +108,33 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun List<Message>.toMessageUiModelList(): List<MessageUiModel> {
-        if (isEmpty()) return emptyList()
+    private suspend fun List<Message>.toMessageUiModelList(): List<MessageUiModel> =
+        if (isEmpty()) emptyList()
+        else calculateUiModelList()
+
+    // TODO: Could have used a separate class for this and made it cleaner
+    private suspend fun List<Message>.calculateUiModelList(): List<MessageUiModel> {
         val messageUiModelList = mutableListOf<MessageUiModel>()
+        withContext(Dispatchers.Default) {
+            this@calculateUiModelList.forEachIndexed { index, currentMessage ->
+                val currentTime = currentMessage.sentAt
+                val prevTime = if (index > 0) this@calculateUiModelList[index - 1].sentAt else null
 
-        this.forEachIndexed { index, currentMessage ->
-            val currentTime = currentMessage.sentAt
-            val prevTime = if (index > 0) this[index - 1].sentAt else null
-
-            if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
-                val currentDateTime = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                messageUiModelList.add(
-                    MessageUiModel.TimeSeparator.fromLocalDateTime(currentDateTime)
-                )
+                if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
+                    val currentDateTime = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                    messageUiModelList.add(
+                        MessageUiModel.TimeSeparator.fromLocalDateTime(currentDateTime)
+                    )
+                }
+                val hasTail = when {
+                    index == this@calculateUiModelList.lastIndex -> true
+                    this@calculateUiModelList.getOrNull(index + 1)?.senderId != currentMessage.senderId -> true
+                    else -> prevTime?.let {
+                        currentTime.minus(it).inWholeSeconds > 20
+                    } ?: false
+                }
+                messageUiModelList.add(currentMessage.toChat(hasTail))
             }
-            val hasTail = when {
-                index == this.lastIndex -> true
-                this.getOrNull(index + 1)?.senderId != currentMessage.senderId -> true
-                else -> prevTime?.let {
-                    currentTime.minus(it).inWholeSeconds > 20
-                } ?: false
-            }
-            messageUiModelList.add(currentMessage.toChat(hasTail))
         }
         return messageUiModelList
     }

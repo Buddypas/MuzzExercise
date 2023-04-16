@@ -12,7 +12,7 @@ abstract class BaseViewModel
     abstract val viewModelStateFlow: StateFlow<State>
     abstract val uiStateFlow: StateFlow<ViewState>
     abstract val uiEventsFlow: MutableSharedFlow<ViewEvent>
-    abstract fun State.toUiState(): ViewState
+    abstract suspend fun State.toUiState(): ViewState
     abstract fun setEvent(event: ViewEvent)
     abstract fun processEvent(event: ViewEvent)
 }
