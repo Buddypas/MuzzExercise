@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        roomVersion = "2.5.1"
+        roomVersion = "2.4.2"
         coreVersion = '1.9.0'
         appCompatVersion = '1.6.1'
         materialVersion = '1.8.0'

@@ -1,12 +1,12 @@
 package me.inflowsolutions.muzzexercise.domain.model
 
 data class User(
-    val id: Int? = null,
+    val id: Int,
     val name: String,
     val imageUrl: String
 )
 
 data class UserState(
-    val currentUser: User? = null,
-    val otherUser: User? = null
+    val currentUser: User,
+    val otherUser: User
 )

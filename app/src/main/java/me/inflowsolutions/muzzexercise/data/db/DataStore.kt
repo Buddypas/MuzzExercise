@@ -18,7 +18,7 @@ class CurrentUserDataStore @Inject constructor(@ApplicationContext private val c
 
     private val currentUserIdFlow: Flow<Int> = context.dataStore.data
         .map { preferences ->
-            preferences[currentUserIdPreferencesKey] ?: 0
+            preferences[currentUserIdPreferencesKey] ?: 1
         }
 
     fun getCurrentUserId(): Flow<Int> = currentUserIdFlow

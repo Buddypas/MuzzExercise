@@ -17,23 +17,35 @@ import me.inflowsolutions.muzzexercise.data.repository.MessageRepositoryImpl
 import me.inflowsolutions.muzzexercise.data.repository.UserRepositoryImpl
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
+import javax.inject.Provider
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object DataModule {
+
+    @Provides
+    @Singleton
+    fun provideRoomCallback(
+        database: Provider<MuzzExerciseDatabase>,
+        @ApplicationScope applicationScope: CoroutineScope
+    ): MuzzExerciseDatabase.RoomCallback {
+        return MuzzExerciseDatabase.RoomCallback(database, applicationScope)
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(
         @ApplicationContext appContext: Context,
         callback: MuzzExerciseDatabase.RoomCallback
-    ): MuzzExerciseDatabase =
-        Room
+    ): MuzzExerciseDatabase {
+        return Room
             .databaseBuilder(appContext, MuzzExerciseDatabase::class.java, "muzz.db")
             .addCallback(callback)
             .fallbackToDestructiveMigration()
             .build()
+    }
 
     @Provides
     fun provideUsersDao(database: MuzzExerciseDatabase): UsersDao =
@@ -54,9 +66,10 @@ object DataModule {
     fun provideUserRepository(
         database: MuzzExerciseDatabase,
         currentUserDataStore: CurrentUserDataStore,
+        roomCallback: MuzzExerciseDatabase.RoomCallback,
         @ApplicationScope applicationScope: CoroutineScope,
     ): UserRepository =
-        UserRepositoryImpl(database, currentUserDataStore, applicationScope)
+        UserRepositoryImpl(database, currentUserDataStore, roomCallback,applicationScope)
 
     @ApplicationScope
     @Provides

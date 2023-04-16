@@ -3,6 +3,7 @@ package me.inflowsolutions.muzzexercise.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,12 +13,12 @@ import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
 import me.inflowsolutions.muzzexercise.data.db.entity.MessageDto
 import me.inflowsolutions.muzzexercise.data.db.entity.UserDto
 import me.inflowsolutions.muzzexercise.data.di.ApplicationScope
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
 
 @Database(entities = [UserDto::class, MessageDto::class], version = 1, exportSchema = false)
-//@TypeConverters(Converters::class)
 abstract class MuzzExerciseDatabase : RoomDatabase() {
     abstract fun usersDao(): UsersDao
     abstract fun messagesDao(): MessagesDao
@@ -25,13 +26,14 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
     class RoomCallback @Inject constructor(
         private val database: Provider<MuzzExerciseDatabase>,
         @ApplicationScope private val applicationScope: CoroutineScope,
-//        private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-    ) : Callback() {
+    ) : RoomDatabase.Callback() {
+        val prePopulationDeferred = CompletableDeferred<Unit>()
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
-            applicationScope.launch(Dispatchers.IO) {
-                database.get().usersDao().insertAll(
+            applicationScope.launch {
+                val userDao = database.get().usersDao()
+                userDao.insertAll(
                     UserDto(
                         id = 1,
                         name = "John",
@@ -43,6 +45,8 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
                         imageUrl = "https://media.istockphoto.com/id/1311858467/photo/head-shot-portrait-attractive-young-indian-woman-looking-at-camera.jpg?s=612x612&w=0&k=20&c=0QWC0t9uc6tptvQkWZxlFKK6hsnOxQBCobTfgkuNbLA="
                     ),
                 )
+                Timber.d("0--> inserted")
+                prePopulationDeferred.complete(Unit)
             }
         }
     }

@@ -20,6 +20,7 @@ import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import me.inflowsolutions.muzzexercise.ui.mvi.BaseViewModel
+import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: Extract strings
@@ -46,11 +47,10 @@ class ChatViewModel @Inject constructor(
         get() = viewModelStateFlow.value.currentUser?.id
 
     init {
-        initViewModelState()
         viewModelScope.launch {
-            uiEventsFlow.collect {
-                processEvent(it)
-            }
+            userRepository.initCurrentUser()
+            initViewModelState()
+            collectEvents()
         }
     }
 
@@ -74,20 +74,26 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun initViewModelState() {
-        viewModelScope.launch {
-            combine(
-                messageRepository.getAllMessages(),
-                userRepository.getUsersFlow()
-            ) { messages, currentUserState ->
-                ChatState(
-                    currentUser = currentUserState.currentUser,
-                    recipientUser = currentUserState.otherUser,
-                    messages = messages
-                )
-            }.collectLatest {
-                viewModelStateFlow.value = it
-            }
+    private suspend fun initViewModelState() {
+        combine(
+            messageRepository.getAllMessages(),
+            userRepository.getUsersFlow()
+        ) { messages, currentUserState ->
+            Timber.d("0--> messages: $messages")
+            Timber.d("0--> currentUserState: $currentUserState")
+            ChatState(
+                currentUser = currentUserState.currentUser,
+                recipientUser = currentUserState.otherUser,
+                messages = messages
+            )
+        }.collectLatest {
+            viewModelStateFlow.value = it
+        }
+    }
+
+    private suspend fun collectEvents() {
+        uiEventsFlow.collect {
+            processEvent(it)
         }
     }
 
@@ -122,7 +128,8 @@ class ChatViewModel @Inject constructor(
                 val prevTime = if (index > 0) this@calculateUiModelList[index - 1].sentAt else null
 
                 if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
-                    val currentDateTime = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val currentDateTime =
+                        currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
                     messageUiModelList.add(
                         MessageUiModel.TimeSeparator.fromLocalDateTime(currentDateTime)
                     )
@@ -148,8 +155,4 @@ class ChatViewModel @Inject constructor(
             isMine = senderId == currentUserId,
             hasTail = hasTail
         )
-}
-
-object MessageListToUiModelListMapper {
-
 }
