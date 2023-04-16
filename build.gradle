@@ -1,16 +1,11 @@
 buildscript {
     ext {
-        composeUiVersion = '1.4.1'
         roomVersion = "2.5.1"
         coreVersion = '1.9.0'
         appCompatVersion = '1.6.1'
         materialVersion = '1.8.0'
-        material3Version = '1.1.0-beta02'
         timberVersion = '5.0.1'
         coroutinesVersion = '1.6.4'
-        composeLifecycleVersion = '2.6.1'
-        composeActivityVersion = '1.7.0'
-        composeMaterialVersion = '1.4.0'
         hiltVersion = '2.45'
         kotlinxDatetimeVersion = '0.4.0'
         datastoreVersion = '1.0.0'

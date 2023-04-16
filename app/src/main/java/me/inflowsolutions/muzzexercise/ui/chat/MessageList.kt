@@ -136,7 +136,6 @@ fun TimeDisplay(day: String, time: String, modifier: Modifier = Modifier) {
     )
 }
 
-// TODO: Add scroll to bottom
 @Composable
 fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier = modifier) {
@@ -154,7 +153,6 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
             modifier = Modifier
                 .fillMaxHeight(),
-//                .padding(horizontal = 32.dp, vertical = 24.dp),
             reverseLayout = true
         ) {
             items(

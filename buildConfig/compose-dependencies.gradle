@@ -1,0 +1,24 @@
+ext {
+    def composeUiVersion = '1.4.1'
+    def composeLifecycleVersion = '2.6.1'
+    def composeActivityVersion = '1.7.0'
+    def material3Version = '1.1.0-beta02'
+
+    composeGeneralDependencies = [
+            activity: "androidx.activity:activity-compose:$composeActivityVersion",
+            core: "androidx.compose.ui:ui:$composeUiVersion",
+            toolingPreview: "androidx.compose.ui:ui-tooling-preview:$composeUiVersion",
+            composeMaterial: "androidx.compose.material:material:$composeUiVersion",
+            materialIcons: "androidx.compose.material:material-icons-extended:$composeUiVersion",
+            material3: "androidx.compose.material3:material3:$material3Version",
+            lifecycleRuntime: "androidx.lifecycle:lifecycle-runtime-ktx:$composeLifecycleVersion",
+            lifecycleViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$composeLifecycleVersion"
+    ]
+
+    composeDebugDependencies = [
+            uiTooling: "androidx.compose.ui:ui-tooling:$composeUiVersion",
+            uiTestManifest: "androidx.compose.ui:ui-test-manifest:$composeUiVersion"
+    ]
+
+}
+

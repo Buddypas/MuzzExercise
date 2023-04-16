@@ -100,7 +100,7 @@ fun MuzzAppBar(
                 modifier = Modifier.wrapContentWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // TODO: Add loader
+                // TODO: Add a loading animation and a placeholder
                 AsyncImage(
                     model = recipientImageUrl,
                     contentDescription = "Avatar image",

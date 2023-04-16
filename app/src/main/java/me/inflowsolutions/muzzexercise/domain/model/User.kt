@@ -6,7 +6,6 @@ data class User(
     val imageUrl: String
 )
 
-// TODO: Extract
 data class UserState(
     val currentUser: User? = null,
     val otherUser: User? = null

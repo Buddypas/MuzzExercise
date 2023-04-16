@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 
 /**
  * The UI accuracy is limited due to not having a real design file.
- * TODO: Play with padding and maybe add ripple
  */
 @Composable
 fun GradientIconButton(
