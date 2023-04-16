@@ -76,7 +76,6 @@ class ChatViewModel @Inject constructor(
 
     private fun initViewModelState() {
         viewModelScope.launch {
-            Timber.d("0--> initViewModelState")
             userRepository.getAllUsers()
                 .take(1)
                 .collectLatest { users ->
@@ -87,12 +86,16 @@ class ChatViewModel @Inject constructor(
                         recipientUser = recipientUser,
                         messages = emptyList()
                     )
-                    messageRepository.getAllMessages().collectLatest { messages ->
-                        viewModelStateFlow.update {
-                            it.copy(messages = messages)
-                        }
-                    }
+                    collectMessages()
                 }
+        }
+    }
+
+    private suspend fun collectMessages() {
+        messageRepository.getAllMessages().collectLatest { messages ->
+            viewModelStateFlow.update {
+                it.copy(messages = messages)
+            }
         }
     }
 
