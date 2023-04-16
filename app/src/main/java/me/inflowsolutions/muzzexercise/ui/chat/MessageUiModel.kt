@@ -12,7 +12,10 @@ sealed class MessageUiModel {
         val hasTail: Boolean
     ) : MessageUiModel()
 
-    data class TimeSeparator(val day: String, val time: String, val timeStamp: Long) :
+    data class TimeSeparator(
+        val day: String,
+        val time: String,
+    ) :
         MessageUiModel() {
         companion object {
             fun fromLocalDateTime(localDateTime: LocalDateTime): TimeSeparator =
@@ -20,7 +23,6 @@ sealed class MessageUiModel {
                     localDateTime.dayOfWeek.name.lowercase()
                         .replaceFirstChar { it.titlecase(Locale.getDefault()) },
                     localDateTime.time.toString().substring(0..4),
-                    System.currentTimeMillis()
                 )
         }
     }

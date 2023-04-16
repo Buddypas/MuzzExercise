@@ -139,3 +139,7 @@ class ChatViewModel @Inject constructor(
             hasTail = hasTail
         )
 }
+
+object MessageListToUiModelListMapper {
+
+}

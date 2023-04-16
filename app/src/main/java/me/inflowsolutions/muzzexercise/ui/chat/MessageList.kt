@@ -38,7 +38,12 @@ import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
 
 @Composable
-fun ColumnScope.MessageBubbleContent(text: String, textColor: Color, showTail: Boolean, modifier: Modifier = Modifier) {
+fun ColumnScope.MessageBubbleContent(
+    text: String,
+    textColor: Color,
+    showTail: Boolean,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = text,
         color = textColor,
@@ -151,18 +156,11 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
         LazyColumn(
             state = listState,
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
-            modifier = Modifier
-                .fillMaxHeight(),
+            modifier = Modifier.fillMaxHeight(),
             reverseLayout = true
         ) {
             items(
-                items = messages,
-                key = { messageUiModel ->
-                    when(messageUiModel) {
-                        is MessageUiModel.Chat -> messageUiModel.id
-                        is MessageUiModel.TimeSeparator -> messageUiModel.timeStamp
-                    }
-                }
+                items = messages
             ) { messageUiModel ->
                 when (messageUiModel) {
                     is MessageUiModel.Chat -> {
