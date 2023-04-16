@@ -8,20 +8,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.inflowsolutions.muzzexercise.data.db.CurrentUserDataStore
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
-import me.inflowsolutions.muzzexercise.data.db.mapper.UserDtoToUserMapper
 import me.inflowsolutions.muzzexercise.data.di.ApplicationScope
+import me.inflowsolutions.muzzexercise.data.toUser
 import me.inflowsolutions.muzzexercise.domain.model.User
 import me.inflowsolutions.muzzexercise.domain.model.UserState
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
-import timber.log.Timber
 
 class UserRepositoryImpl(
     private val db: MuzzExerciseDatabase,
     private val currentUserDataStore: CurrentUserDataStore,
-    private val userDtoMapper: UserDtoToUserMapper,
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : UserRepository {
@@ -31,12 +28,7 @@ class UserRepositoryImpl(
         initCurrentUser()
     }
 
-    override suspend fun getUserById(id: Int): User {
-        val userDto = db.usersDao().getUserById(id)
-        val user = userDtoMapper.map(userDto)
-        Timber.d("0--> user: $user")
-        return user
-    }
+    override suspend fun getUserById(id: Int): User? = db.usersDao().getUserById(id)?.toUser()
 
     override fun getUsersFlow(): Flow<UserState> = currentUserStateFlow.asSharedFlow()
 
@@ -50,8 +42,8 @@ class UserRepositoryImpl(
     private fun initCurrentUser() {
         coroutineScope.launch(ioDispatcher) {
             currentUserDataStore.getCurrentUserId().collectLatest { currentUserId ->
-                val currentUser: User
-                val otherUser: User
+                val currentUser: User?
+                val otherUser: User?
                 if (currentUserId == 0) {
                     currentUser = getUserById(defaultCurrentUserId)
                     otherUser = getUserById(defaultOtherUserId)
@@ -63,8 +55,6 @@ class UserRepositoryImpl(
             }
         }
     }
-
-    // TODO: Function order
 
     private companion object {
         const val defaultCurrentUserId: Int = 1

@@ -42,6 +42,11 @@ class ChatViewModel @Inject constructor(
 
     init {
         initViewModelState()
+        viewModelScope.launch {
+            uiEventsFlow.collect {
+                processEvent(it)
+            }
+        }
     }
 
     override fun ChatState.toUiState(): ChatUiState =
@@ -55,10 +60,9 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             uiEventsFlow.emit(event)
         }
-
     }
 
-    override fun handleEvents(event: ChatUiEvent) {
+    override fun processEvent(event: ChatUiEvent) {
         when (event) {
             ChatUiEvent.SwitchUser -> switchUser()
             is ChatUiEvent.AddMessage -> sendMessage(event.text)

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
@@ -20,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -133,15 +136,25 @@ fun TimeDisplay(day: String, time: String, modifier: Modifier = Modifier) {
     )
 }
 
+// TODO: Add scroll to bottom
 @Composable
 fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier = modifier) {
         val maxWidthFraction = maxWidth * 0.66f
+        val listState = rememberLazyListState()
+
+        LaunchedEffect(messages.size) {
+            if (messages.isNotEmpty()) {
+                listState.animateScrollToItem(index = 0)
+            }
+        }
 
         LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(horizontal = 32.dp, vertical = 24.dp),
+                .fillMaxHeight(),
+//                .padding(horizontal = 32.dp, vertical = 24.dp),
             reverseLayout = true
         ) {
             items(

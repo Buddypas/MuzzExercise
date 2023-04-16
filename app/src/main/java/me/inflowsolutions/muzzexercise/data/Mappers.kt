@@ -6,7 +6,7 @@ import me.inflowsolutions.muzzexercise.data.db.entity.UserDto
 import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.model.User
 
-suspend fun UserDto.toMessage(): User = User(id, name, imageUrl)
+suspend fun UserDto.toUser(): User = User(id, name, imageUrl)
 
 suspend fun MessageDto.toMessage(): Message =
     Message(
