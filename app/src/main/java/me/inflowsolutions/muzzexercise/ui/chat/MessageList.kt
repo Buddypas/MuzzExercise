@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
 
-
 @Composable
 fun ColumnScope.MessageBubbleContent(text: String, textColor: Color, showTail: Boolean, modifier: Modifier = Modifier) {
     Text(
@@ -147,8 +146,12 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
         ) {
             items(
                 items = messages,
-                // TODO: Add key
-//                key = { message -> message.id ?: 0 }
+                key = { messageUiModel ->
+                    when(messageUiModel) {
+                        is MessageUiModel.Chat -> messageUiModel.id
+                        is MessageUiModel.TimeSeparator -> messageUiModel.timeStamp
+                    }
+                }
             ) { messageUiModel ->
                 when (messageUiModel) {
                     is MessageUiModel.Chat -> {

@@ -32,11 +32,10 @@ class UserRepositoryImpl(
     }
 
     override suspend fun getUserById(id: Int): User {
-        db.usersDao().getUserById(id).let { currentUser ->
-            val user = userDtoMapper.map(currentUser)
-            Timber.d("0--> user: $user")
-            return user
-        }
+        val userDto = db.usersDao().getUserById(id)
+        val user = userDtoMapper.map(userDto)
+        Timber.d("0--> user: $user")
+        return user
     }
 
     override fun getUsersFlow(): Flow<UserState> = currentUserStateFlow.asSharedFlow()
