@@ -1,8 +1,9 @@
 package me.inflowsolutions.muzzexercise.ui.chat
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,9 +14,13 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -23,43 +28,69 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
+import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
+
 
 @Composable
-fun UserMessage(text: String, modifier: Modifier = Modifier) {
-    Box(
+fun ColumnScope.MessageBubbleContent(text: String, textColor: Color, showTail: Boolean, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        color = textColor,
+        modifier = modifier
+            .align(Alignment.CenterHorizontally)
+            .then(
+                if (showTail) Modifier.padding(top = 12.dp, end = 16.dp, start = 16.dp)
+                else Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
+            )
+    )
+    if (showTail)
+        Icon(
+            Icons.Filled.DoneAll,
+            tint = Color.Green,
+            contentDescription = "Delivered",
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(bottom = 4.dp, end = 8.dp)
+        )
+}
+
+@Composable
+fun UserMessageBubble(text: String, showTail: Boolean, modifier: Modifier = Modifier) {
+    Column(
         modifier = modifier
             .background(
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 16.dp,
+                    bottomStart = 16.dp,
+                    bottomEnd = 0.dp
+                )
             )
-            .padding(12.dp),
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            textAlign = TextAlign.End
-        )
+        MessageBubbleContent(text, Color.White, showTail, modifier)
     }
 }
 
 @Composable
-fun FriendMessage(text: String, modifier: Modifier = Modifier) {
-    Box(
+fun FriendMessageBubble(text: String, showTail: Boolean, modifier: Modifier = Modifier) {
+    Column(
         modifier = modifier
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 16.dp,
+                    bottomEnd = 16.dp,
+                    bottomStart = 0.dp
+                )
             )
-            .padding(12.dp),
     ) {
-        Text(
-            text = text,
-            color = DarkGray,
-            textAlign = TextAlign.Start
-        )
+        MessageBubbleContent(text, DarkGray, showTail, modifier)
     }
 }
 
@@ -68,14 +99,16 @@ fun Message(chat: MessageUiModel.Chat, maxWidthFraction: Dp, modifier: Modifier 
     Row(modifier = modifier.fillMaxWidth()) {
         if (chat.isMine) {
             Spacer(Modifier.weight(1f))
-            UserMessage(
+            UserMessageBubble(
                 chat.content,
+                chat.hasTail,
                 Modifier
                     .widthIn(max = maxWidthFraction)
             )
         } else {
-            FriendMessage(
+            FriendMessageBubble(
                 chat.content,
+                chat.hasTail,
                 Modifier
                     .widthIn(max = maxWidthFraction)
             )
@@ -131,6 +164,22 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
                 }
                 Spacer(Modifier.height(12.dp))
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MessageBubblePreview() {
+    MuzzExerciseTheme {
+        Column {
+            UserMessageBubble("This is the message text which should be pretty", true)
+            Spacer(modifier = Modifier.height(24.dp))
+            UserMessageBubble("This is the message text which should be pretty", false)
+            Spacer(modifier = Modifier.height(24.dp))
+            FriendMessageBubble("This is the message text which should be pretty", true)
+            Spacer(modifier = Modifier.height(24.dp))
+            FriendMessageBubble("This is the message text which should be pretty", false)
         }
     }
 }

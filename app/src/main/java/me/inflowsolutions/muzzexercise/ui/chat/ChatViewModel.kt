@@ -123,8 +123,8 @@ class ChatViewModel @Inject constructor(
         if (isEmpty()) return emptyList()
         val messageUiModelList = mutableListOf<MessageUiModel>()
 
-        this.forEachIndexed { index, message ->
-            val currentTime = message.sentAt
+        this.forEachIndexed { index, currentMessage ->
+            val currentTime = currentMessage.sentAt
             val prevTime = if (index > 0) this[index - 1].sentAt else null
 
             if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
@@ -135,12 +135,12 @@ class ChatViewModel @Inject constructor(
             }
             val hasTail = when {
                 index == this.lastIndex -> true
-                this.getOrNull(index + 1)?.senderId != (currentUserId ?: 0) -> true
+                this.getOrNull(index + 1)?.senderId != currentMessage.senderId -> true
                 else -> prevTime?.let {
                     currentTime.minus(it).inWholeSeconds > 20
                 } ?: false
             }
-            messageUiModelList.add(message.toChat(hasTail))
+            messageUiModelList.add(currentMessage.toChat(hasTail))
         }
         return messageUiModelList
     }
