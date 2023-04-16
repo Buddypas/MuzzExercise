@@ -17,7 +17,6 @@
         <activity
             android:name=".ui.chat.ChatActivity"
             android:exported="true"
-            android:label="@string/title_activity_chat"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.MuzzExercise">
             <intent-filter>
@@ -26,5 +25,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

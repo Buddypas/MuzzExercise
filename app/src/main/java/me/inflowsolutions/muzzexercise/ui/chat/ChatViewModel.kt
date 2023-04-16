@@ -22,6 +22,7 @@ import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import me.inflowsolutions.muzzexercise.ui.mvi.BaseViewModel
 import javax.inject.Inject
 
+// TODO: Extract strings
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
