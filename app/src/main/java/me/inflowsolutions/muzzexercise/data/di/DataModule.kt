@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import me.inflowsolutions.muzzexercise.data.db.CurrentUserDataStore
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
 import me.inflowsolutions.muzzexercise.data.db.dao.MessagesDao
 import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
@@ -56,8 +57,10 @@ object DataModule {
     fun provideUserRepository(
         database: MuzzExerciseDatabase,
         userDtoMapper: UserDtoToUserMapper,
+        currentUserDataStore: CurrentUserDataStore,
         @ApplicationScope applicationScope: CoroutineScope,
-    ): UserRepository = UserRepositoryImpl(database, userDtoMapper, applicationScope)
+    ): UserRepository =
+        UserRepositoryImpl(database, currentUserDataStore, userDtoMapper, applicationScope)
 
     @ApplicationScope
     @Provides

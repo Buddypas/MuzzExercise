@@ -1,10 +1,11 @@
 package me.inflowsolutions.muzzexercise.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import me.inflowsolutions.muzzexercise.domain.model.User
+import me.inflowsolutions.muzzexercise.domain.model.UserState
 
 interface UserRepository {
     suspend fun getUserById(id: Int): User
-    suspend fun getDefaultUser(): User
-    suspend fun setCurrentUser(user: User)
+    fun getUsersFlow(): Flow<UserState>
     suspend fun switchUser()
 }
