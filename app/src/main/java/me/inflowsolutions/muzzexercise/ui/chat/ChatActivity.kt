@@ -1,5 +1,6 @@
 package me.inflowsolutions.muzzexercise.ui.chat
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -51,8 +52,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.More
+import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -90,8 +94,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
         }
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             Column(Modifier.fillMaxWidth()) {
@@ -116,6 +119,7 @@ fun MuzzAppBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val activity = (LocalContext.current as? Activity)
     TopAppBar(
         title = {
             Row(
@@ -138,15 +142,24 @@ fun MuzzAppBar(
                 )
             }
         },
-        navigationIcon = {
-            IconButton(onClick = { onBackClick() }) {
+        navigationIcon =
+        {
+            IconButton(onClick = { activity?.finish() }) {
                 Icon(
                     Icons.Outlined.ArrowBackIosNew,
                     tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = "Navigate up",
+                    modifier = Modifier.height(36.dp)
+                )
+            }
+        },
+        actions = {
+            IconButton(onClick = { onBackClick() }) {
+                Icon(
+                    Icons.Outlined.MoreHoriz,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = "Switch user",
-                    modifier = Modifier.height(36.dp),
-
-                    )
+                )
             }
         },
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -262,17 +275,20 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
     }
 }
 
+// TODO: Handle max width
 @Composable
 fun MessageInputField(onSendClick: (String) -> Unit, modifier: Modifier = Modifier) {
     var fieldText by remember { mutableStateOf("") }
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+        shape = CardDefaults.shape
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color.White)
                 .padding(16.dp)
         ) {
@@ -280,7 +296,6 @@ fun MessageInputField(onSendClick: (String) -> Unit, modifier: Modifier = Modifi
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 shape = CircleShape,
                 placeholder = {
-                    // TODO: Add material colors
                     Text(
                         "Type your message here",
                         style = MaterialTheme.typography.bodyLarge.copy(color = DarkGray)
