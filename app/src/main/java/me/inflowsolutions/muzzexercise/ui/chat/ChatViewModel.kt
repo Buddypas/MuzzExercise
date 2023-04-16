@@ -48,10 +48,8 @@ class ChatViewModel @Inject constructor(
         get() = viewModelStateFlow.value.currentUser?.id
 
     init {
-        viewModelScope.launch {
-            initViewModelState()
-            collectEvents()
-        }
+        initViewModelState()
+        collectEvents()
     }
 
     override suspend fun ChatState.toUiState(): ChatUiState =
@@ -74,24 +72,31 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initViewModelState() {
-        Timber.d("0--> initViewModelState")
-        val currentUser = userRepository.getUserById(defaultCurrentUserId)
-        val recipientUser = userRepository.getUserById(defaultOtherUserId)
-        Timber.d("0--> currentUser: $currentUser, recipientUser: $recipientUser")
+    private fun initViewModelState() {
+        viewModelScope.launch {
+            Timber.d("0--> initViewModelState")
 
-        val messages = messageRepository.getAllMessages()
-        val state = ChatState(
-            currentUser = currentUser,
-            recipientUser = recipientUser,
-            messages = messages
-        )
-        viewModelStateFlow.value = state
+            combine(
+                messageRepository.getAllMessages(),
+                userRepository.getAllUsers()
+            ) { messages, users ->
+                ChatState(
+                    currentUser = users.firstOrNull(),
+                    recipientUser = users.getOrNull(1),
+                    messages = messages
+                )
+            }.collectLatest {
+                Timber.d("0--> chatState: $it")
+                viewModelStateFlow.value = it
+            }
+        }
     }
 
-    private suspend fun collectEvents() {
-        uiEventsFlow.collect {
-            processEvent(it)
+    private fun collectEvents() {
+        viewModelScope.launch {
+            uiEventsFlow.collect {
+                processEvent(it)
+            }
         }
     }
 
@@ -157,9 +162,4 @@ class ChatViewModel @Inject constructor(
             isMine = senderId == currentUserId,
             hasTail = hasTail
         )
-
-    private companion object {
-        const val defaultCurrentUserId: Int = 1
-        const val defaultOtherUserId: Int = 2
-    }
 }

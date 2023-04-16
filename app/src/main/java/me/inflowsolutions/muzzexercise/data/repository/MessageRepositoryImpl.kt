@@ -3,6 +3,7 @@ package me.inflowsolutions.muzzexercise.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
@@ -15,8 +16,10 @@ class MessageRepositoryImpl(
     private val db: MuzzExerciseDatabase,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : MessageRepository {
-    override suspend fun getAllMessages(): List<Message> =
-        db.messagesDao().getAllMessages().map { it.toMessage() }
+    override fun getAllMessages(): Flow<List<Message>> =
+        db.messagesDao().getAllMessages().map {
+            it.map { messageDto -> messageDto.toMessage() }
+        }.flowOn(ioDispatcher)
 
     override suspend fun sendMessage(message: Message) {
         withContext(ioDispatcher) {

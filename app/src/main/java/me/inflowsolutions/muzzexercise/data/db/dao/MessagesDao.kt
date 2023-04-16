@@ -10,7 +10,7 @@ import me.inflowsolutions.muzzexercise.data.db.entity.MessageDto
 @Dao
 interface MessagesDao {
     @Query("SELECT * FROM messages")
-    suspend fun getAllMessages(): List<MessageDto>
+    fun getAllMessages(): Flow<List<MessageDto>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessage(vararg messages: MessageDto)
