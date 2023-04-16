@@ -9,5 +9,5 @@ import me.inflowsolutions.muzzexercise.domain.model.User
 class UserDtoToUserMapper(
     coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : SuspendingMapper<UserDto, User>(coroutineDispatcher) {
-    override suspend fun UserDto.toMappedEntity(): User = User(id, name)
+    override suspend fun UserDto.toMappedEntity(): User = User(id, name, imageUrl)
 }

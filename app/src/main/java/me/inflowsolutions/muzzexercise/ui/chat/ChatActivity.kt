@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,10 +48,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import me.inflowsolutions.muzzexercise.ui.GradientIconButton
 import me.inflowsolutions.muzzexercise.ui.theme.Beige
@@ -75,36 +86,72 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(state.recipientName, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
-                },
-                navigationIcon = {
-                    IconButton({ viewModel.onBackClick() }) {
-                        Icon(
-                            Icons.Filled.KeyboardArrowLeft,
-                            contentDescription = "Switch user"
-                        )
-                    }
-                },
-                backgroundColor = MaterialTheme.colorScheme.background
-            )
+            MuzzAppBar(state.recipientName, state.recipientImageUrl, { viewModel.onBackClick() })
         }
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
+                .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(modifier = Modifier.padding(it)) {
-                MessageList(state.messages.asReversed(), modifier = Modifier.weight(1f))
-                MessageInputField { messageText ->
-                    viewModel.onSendClick(messageText)
-                }
+            Column(Modifier.fillMaxWidth()) {
+                MessageList(
+                    state.messages.asReversed(), modifier = Modifier
+                        .weight(1f)
+                        .padding(it)
+                )
+                MessageInputField(
+                    modifier = Modifier.fillMaxWidth(),
+                    onSendClick = { viewModel.onSendClick(it) },
+                )
             }
         }
     }
+}
+
+@Composable
+fun MuzzAppBar(
+    recipientName: String,
+    recipientImageUrl: String,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.wrapContentWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // TODO: Add loader
+                AsyncImage(
+                    model = recipientImageUrl,
+                    contentDescription = "Avatar image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(36.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    recipientName,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = { onBackClick() }) {
+                Icon(
+                    Icons.Outlined.ArrowBackIosNew,
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = "Switch user",
+                    modifier = Modifier.height(36.dp),
+
+                    )
+            }
+        },
+        backgroundColor = MaterialTheme.colorScheme.background,
+        modifier = modifier.height(56.dp),
+    )
 }
 
 @Composable
@@ -164,6 +211,23 @@ fun Message(chat: MessageUiModel.Chat, maxWidthFraction: Dp, modifier: Modifier 
     }
 }
 
+@Composable
+fun TimeDisplay(day: String, time: String, modifier: Modifier = Modifier) {
+    Text(
+        buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(day)
+            }
+            append(" $time")
+        },
+        style = MaterialTheme.typography.bodyMedium.copy(
+            textAlign = TextAlign.Center,
+            color = DarkGray
+        ),
+        modifier = modifier
+    )
+}
+
 
 @Composable
 fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
@@ -176,15 +240,20 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
                 .padding(horizontal = 32.dp, vertical = 24.dp),
             reverseLayout = true
         ) {
-            items(items = messages,
+            items(
+                items = messages,
 //                key = { message -> message.id ?: 0 }
             ) { messageUiModel ->
-                when(messageUiModel) {
+                when (messageUiModel) {
                     is MessageUiModel.Chat -> {
                         Message(messageUiModel, maxWidthFraction)
                     }
                     is MessageUiModel.TimeSeparator -> {
-                        Text("${messageUiModel.day} ${messageUiModel.time}")
+                        TimeDisplay(
+                            day = messageUiModel.day,
+                            time = messageUiModel.time,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -194,10 +263,13 @@ fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MessageInputField(onSendClick: (String) -> Unit) {
+fun MessageInputField(onSendClick: (String) -> Unit, modifier: Modifier = Modifier) {
     var fieldText by remember { mutableStateOf("") }
 
-    Card(elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -206,7 +278,6 @@ fun MessageInputField(onSendClick: (String) -> Unit) {
         ) {
             OutlinedTextField(
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-
                 shape = CircleShape,
                 placeholder = {
                     // TODO: Add material colors
@@ -219,26 +290,60 @@ fun MessageInputField(onSendClick: (String) -> Unit) {
                 onValueChange = { fieldText = it },
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
-            Spacer(Modifier.width(32.dp))
-            SendButton({
-                onSendClick(fieldText)
-                fieldText = ""
-            })
+            Spacer(Modifier.width(24.dp))
+            SendButton(
+                onClick =
+                if (fieldText.isEmpty()) null
+                else (
+                    {
+                        onSendClick(fieldText)
+                        fieldText = ""
+                    })
+            )
         }
     }
 }
 
 @Composable
 fun SendButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
-    GradientIconButton(listOf(Pink, Beige), onClick, modifier) {
+    GradientIconButton(
+        gradientColors = listOf(Pink, Beige),
+        onClick = onClick,
+        modifier = modifier
+    ) {
         Icon(
             imageVector = Icons.Filled.Send,
             contentDescription = "send",
             tint = Color.White
         )
+    }
+}
+
+//@Preview(showBackground = true)
+//@Composable
+//fun TimeDisplayPreview() {
+//    MuzzExerciseTheme {
+//        TimeDisplay("Monday", "12:25")
+//    }
+//}
+
+@Preview(showBackground = true)
+@Composable
+fun MuzzAppBarPreview() {
+    MuzzExerciseTheme {
+        Scaffold(
+            topBar = {
+                MuzzAppBar(
+                    "Sarah",
+                    "https://t4.ftcdn.net/jpg/03/98/85/77/360_F_398857704_n44BPhqM68Xk9vT31BeFkLQwWsgeZS6C.jpg",
+                    {})
+            }
+        ) {
+            Spacer(modifier = Modifier.padding(it))
+        }
     }
 }
 
@@ -249,3 +354,4 @@ fun ChatScreenPreview() {
         ChatScreen()
     }
 }
+

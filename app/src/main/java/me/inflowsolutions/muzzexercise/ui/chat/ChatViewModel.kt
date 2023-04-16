@@ -1,5 +1,6 @@
 package me.inflowsolutions.muzzexercise.ui.chat
 
+import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.inflowsolutions.muzzexercise.domain.model.Message
@@ -20,6 +23,7 @@ import me.inflowsolutions.muzzexercise.domain.model.User
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 sealed class MessageUiModel {
@@ -30,7 +34,16 @@ sealed class MessageUiModel {
         val hasTail: Boolean
     ) : MessageUiModel()
 
-    data class TimeSeparator(val day: String, val time: String) : MessageUiModel()
+    data class TimeSeparator(val day: String, val time: String) : MessageUiModel() {
+        companion object {
+            fun fromLocalDateTime(localDateTime: LocalDateTime): TimeSeparator =
+                TimeSeparator(
+                    localDateTime.dayOfWeek.name.lowercase()
+                        .replaceFirstChar { it.titlecase(Locale.getDefault()) },
+                    localDateTime.time.toString().substring(0..4)
+                )
+        }
+    }
 }
 
 // TODO: Add interfaces
@@ -42,7 +55,8 @@ data class ChatState(
 
 data class ChatUiState(
     val messages: List<MessageUiModel> = emptyList(),
-    val recipientName: String = ""
+    val recipientName: String = "",
+    val recipientImageUrl: String = "",
 )
 
 @HiltViewModel
@@ -114,10 +128,7 @@ class ChatViewModel @Inject constructor(
             if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
                 val currentDateTime = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
                 messageUiModelList.add(
-                    MessageUiModel.TimeSeparator(
-                        currentDateTime.dayOfWeek.name,
-                        currentDateTime.time.toString()
-                    )
+                    MessageUiModel.TimeSeparator.fromLocalDateTime(currentDateTime)
                 )
             }
             messageUiModelList.add(message.toChat())
@@ -137,6 +148,7 @@ class ChatViewModel @Inject constructor(
     private fun ChatState.toUiState(): ChatUiState =
         ChatUiState(
             recipientName = recipientUser?.name.orEmpty(),
+            recipientImageUrl = recipientUser?.imageUrl.orEmpty(),
             messages = messages.toMessageUiModelList()
         )
 }

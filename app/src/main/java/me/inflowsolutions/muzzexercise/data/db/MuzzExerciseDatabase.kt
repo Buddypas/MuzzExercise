@@ -29,8 +29,14 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
             super.onCreate(db)
             applicationScope.launch {
                 database.get().usersDao().insertAll(
-                    UserDto(1, "John"),
-                    UserDto(2, "Sarah"),
+                    UserDto(
+                        name = "John",
+                        imageUrl = "https://t4.ftcdn.net/jpg/03/98/85/77/360_F_398857704_n44BPhqM68Xk9vT31BeFkLQwWsgeZS6C.jpg"
+                    ),
+                    UserDto(
+                        name = "Sarah",
+                        imageUrl = "https://media.istockphoto.com/id/1311858467/photo/head-shot-portrait-attractive-young-indian-woman-looking-at-camera.jpg?s=612x612&w=0&k=20&c=0QWC0t9uc6tptvQkWZxlFKK6hsnOxQBCobTfgkuNbLA="
+                    ),
                 )
             }
         }

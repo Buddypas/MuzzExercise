@@ -14,23 +14,26 @@ import androidx.compose.ui.unit.dp
 
 /**
  * The UI accuracy is limited due to not having a real design file.
- * TODO: Play with padding
+ * TODO: Play with padding and maybe add ripple
  */
 @Composable
 fun GradientIconButton(
     gradientColors: List<Color>,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     icon: @Composable () -> Unit
 ) {
+    val colors = if(onClick == null) gradientColors.map {
+        it.copy(alpha = 0.5f)
+    } else gradientColors
     Box(
         modifier = modifier
             .background(
-                brush = Brush.linearGradient(colors = gradientColors),
+                brush = Brush.linearGradient(colors = colors),
                 shape = CircleShape
             )
-            .padding(horizontal = 12.dp, vertical = 12.dp)
-            .clickable { onClick() },
+            .padding(8.dp)
+            .clickable { onClick?.invoke() },
         contentAlignment = Alignment.Center
     ) {
         icon()

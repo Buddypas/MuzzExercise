@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "users")
 data class UserDto(
     // Could have also been a long or string, using Int for simplicity
-    @PrimaryKey val id: Int = 0,
-    val name: String
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val imageUrl: String
 )

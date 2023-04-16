@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.inflowsolutions.muzzexercise.data.db.CurrentUserDataStore
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
 import me.inflowsolutions.muzzexercise.data.db.mapper.UserDtoToUserMapper
@@ -15,6 +16,7 @@ import me.inflowsolutions.muzzexercise.data.di.ApplicationScope
 import me.inflowsolutions.muzzexercise.domain.model.User
 import me.inflowsolutions.muzzexercise.domain.model.UserState
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
+import timber.log.Timber
 
 class UserRepositoryImpl(
     private val db: MuzzExerciseDatabase,
@@ -31,7 +33,9 @@ class UserRepositoryImpl(
 
     override suspend fun getUserById(id: Int): User {
         db.usersDao().getUserById(id).let { currentUser ->
-            return userDtoMapper.map(currentUser)
+            val user = userDtoMapper.map(currentUser)
+            Timber.d("0--> user: $user")
+            return user
         }
     }
 
