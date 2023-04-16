@@ -46,11 +46,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatActivity : ComponentActivity() {
-//    @Inject
-//    lateinit var db: RoomDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        Timber.d("0--> db: $db")
         setContent {
             MuzzExerciseTheme {
                 ChatScreen()

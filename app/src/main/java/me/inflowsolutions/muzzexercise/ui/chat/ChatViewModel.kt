@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,34 +77,22 @@ class ChatViewModel @Inject constructor(
     private fun initViewModelState() {
         viewModelScope.launch {
             Timber.d("0--> initViewModelState")
-            userRepository.getAllUsers().collectLatest { users ->
-                val currentUser = users.firstOrNull()
-                val recipientUser = users.getOrNull(1)
-                viewModelStateFlow.value = ChatState(
-                    currentUser = currentUser,
-                    recipientUser = recipientUser,
-                    messages = emptyList()
-                )
-                messageRepository.getAllMessages().collectLatest { messages ->
-                    viewModelStateFlow.update {
-                        it.copy(messages = messages)
+            userRepository.getAllUsers()
+                .take(1)
+                .collectLatest { users ->
+                    val currentUser = users.firstOrNull()
+                    val recipientUser = users.lastOrNull()
+                    viewModelStateFlow.value = ChatState(
+                        currentUser = currentUser,
+                        recipientUser = recipientUser,
+                        messages = emptyList()
+                    )
+                    messageRepository.getAllMessages().collectLatest { messages ->
+                        viewModelStateFlow.update {
+                            it.copy(messages = messages)
+                        }
                     }
                 }
-            }
-
-//            combine(
-//                messageRepository.getAllMessages(),
-//                userRepository.getAllUsers()
-//            ) { messages, users ->
-//                ChatState(
-//                    currentUser = users.firstOrNull(),
-//                    recipientUser = users.getOrNull(1),
-//                    messages = messages
-//                )
-//            }.collectLatest {
-//                Timber.d("0--> chatState: $it")
-//                viewModelStateFlow.value = it
-//            }
         }
     }
 

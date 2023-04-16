@@ -28,7 +28,6 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
         private val database: Provider<MuzzExerciseDatabase>,
         @ApplicationScope private val applicationScope: CoroutineScope,
     ) : RoomDatabase.Callback() {
-//        val prePopulationDeferred = CompletableDeferred<Unit>()
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
@@ -38,18 +37,15 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
             applicationScope.launch {
                 userDao.insertAll(
                     UserDto(
-//                        id = 1,
                         name = "John",
                         imageUrl = "https://t4.ftcdn.net/jpg/03/98/85/77/360_F_398857704_n44BPhqM68Xk9vT31BeFkLQwWsgeZS6C.jpg"
                     ),
                     UserDto(
-//                        id = 2,
                         name = "Sarah",
                         imageUrl = "https://media.istockphoto.com/id/1311858467/photo/head-shot-portrait-attractive-young-indian-woman-looking-at-camera.jpg?s=612x612&w=0&k=20&c=0QWC0t9uc6tptvQkWZxlFKK6hsnOxQBCobTfgkuNbLA="
                     ),
                 )
                 Timber.d("0--> inserted")
-//                prePopulationDeferred.complete(Unit)
             }
         }
     }
