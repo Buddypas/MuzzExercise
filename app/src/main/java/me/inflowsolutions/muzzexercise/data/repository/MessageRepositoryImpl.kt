@@ -27,7 +27,7 @@ class MessageRepositoryImpl(
         withContext(ioDispatcher) {
             val messageDto = MessageDto(
                 content = message.content,
-                senderId = 0,
+                senderId = message.senderId,
                 timestamp = message.sentAt.toEpochMilliseconds()
             )
             db.messagesDao().insertMessage(messageDto)

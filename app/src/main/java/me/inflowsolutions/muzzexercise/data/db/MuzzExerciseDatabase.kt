@@ -29,8 +29,8 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
             super.onCreate(db)
             applicationScope.launch {
                 database.get().usersDao().insertAll(
-                    UserDto(name = "John"),
-                    UserDto(name = "Sarah"),
+                    UserDto(1, "John"),
+                    UserDto(2, "Sarah"),
                 )
             }
         }

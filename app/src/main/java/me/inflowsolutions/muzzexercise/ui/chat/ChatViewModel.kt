@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.model.User
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
@@ -21,8 +23,14 @@ import timber.log.Timber
 import javax.inject.Inject
 
 sealed class MessageUiModel {
-    data class Chat(val content: String, val time: String, val isMine: Boolean)
-    data class TimeSeparator(val day: String, val time: String)
+    data class Chat(
+        val content: String,
+        val time: String,
+        val isMine: Boolean,
+        val hasTail: Boolean
+    ) : MessageUiModel()
+
+    data class TimeSeparator(val day: String, val time: String) : MessageUiModel()
 }
 
 // TODO: Add interfaces
@@ -46,7 +54,9 @@ class ChatViewModel @Inject constructor(
 
     val uiState: StateFlow<ChatUiState> by lazy {
         viewModelState
-            .map { it.toUiState() }
+            .map {
+                it.toUiState()
+            }
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -64,8 +74,8 @@ class ChatViewModel @Inject constructor(
                         messages = messages
                     )
                 }.collectLatest {
-                viewModelState.value = it
-            }
+                    viewModelState.value = it
+                }
         }
     }
 
@@ -75,13 +85,13 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 Message(
                     content = text,
-                    senderId = 1,
+                    senderId = viewModelState.value.currentUser?.id ?: 0,
                     sentAt = Clock.System.now()
                 )
             }.mapCatching { message ->
                 messageRepository.sendMessage(message)
+                Timber.d("0--> message sent: $message")
             }.onSuccess {
-                Timber.d("0--> message sent")
             }
         }
     }
@@ -89,13 +99,39 @@ class ChatViewModel @Inject constructor(
     fun onBackClick() {
         viewModelScope.launch {
             userRepository.switchUser()
+            Timber.d("0--> curr user after userSwitch: ${viewModelState.value.currentUser}")
         }
     }
 
     private fun List<Message>.toMessageUiModelList(): List<MessageUiModel> {
-        // TODO: Implement
-        return emptyList()
+        if (isEmpty()) return emptyList()
+        val messageUiModelList = mutableListOf<MessageUiModel>()
+
+        this.forEachIndexed { index, message ->
+            val currentTime = message.sentAt
+            val prevTime = if (index > 0) this[index - 1].sentAt else null
+
+            if (prevTime == null || currentTime.minus(prevTime).inWholeHours > 1) {
+                val currentDateTime = currentTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                messageUiModelList.add(
+                    MessageUiModel.TimeSeparator(
+                        currentDateTime.dayOfWeek.name,
+                        currentDateTime.time.toString()
+                    )
+                )
+            }
+            messageUiModelList.add(message.toChat())
+        }
+        return messageUiModelList
     }
+
+    private fun Message.toChat(): MessageUiModel.Chat =
+        MessageUiModel.Chat(
+            content = content,
+            time = sentAt.toLocalDateTime(TimeZone.currentSystemDefault()).time.toString(),
+            isMine = senderId == viewModelState.value.currentUser?.id,
+            hasTail = false
+        )
 
     // TODO: Create mapper
     private fun ChatState.toUiState(): ChatUiState =

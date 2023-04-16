@@ -47,10 +47,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
-import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.ui.GradientIconButton
 import me.inflowsolutions.muzzexercise.ui.theme.Beige
 import me.inflowsolutions.muzzexercise.ui.theme.DarkGray
@@ -71,21 +71,19 @@ class ChatActivity : ComponentActivity() {
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
-    val messages by viewModel.getMessages().collectAsState()
+    val state by viewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Sarah", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
+                    Text(state.recipientName, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
                 },
                 navigationIcon = {
-                    IconButton({
-
-                    }) {
+                    IconButton({ viewModel.onBackClick() }) {
                         Icon(
                             Icons.Filled.KeyboardArrowLeft,
-                            contentDescription = ""
+                            contentDescription = "Switch user"
                         )
                     }
                 },
@@ -100,7 +98,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
             color = MaterialTheme.colorScheme.background
         ) {
             Column(modifier = Modifier.padding(it)) {
-                MessageList(messages.asReversed(), modifier = Modifier.weight(1f))
+                MessageList(state.messages.asReversed(), modifier = Modifier.weight(1f))
                 MessageInputField { messageText ->
                     viewModel.onSendClick(messageText)
                 }
@@ -146,7 +144,29 @@ fun FriendMessage(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
+fun Message(chat: MessageUiModel.Chat, maxWidthFraction: Dp, modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxWidth()) {
+        if (chat.isMine) {
+            Spacer(Modifier.weight(1f))
+            UserMessage(
+                chat.content,
+                Modifier
+                    .widthIn(max = maxWidthFraction)
+            )
+        } else {
+            FriendMessage(
+                chat.content,
+                Modifier
+                    .widthIn(max = maxWidthFraction)
+            )
+            Spacer(Modifier.weight(1f))
+        }
+    }
+}
+
+
+@Composable
+fun MessageList(messages: List<MessageUiModel>, modifier: Modifier = Modifier) {
     BoxWithConstraints(modifier = modifier) {
         val maxWidthFraction = maxWidth * 0.66f
 
@@ -156,23 +176,15 @@ fun MessageList(messages: List<Message>, modifier: Modifier = Modifier) {
                 .padding(horizontal = 32.dp, vertical = 24.dp),
             reverseLayout = true
         ) {
-            items(items = messages, key = { message -> message.id ?: 0 }) { message ->
-                val isUserMessage = message.senderId == 0
-                Row(modifier = modifier.fillMaxWidth()) {
-                    if (isUserMessage) {
-                        Spacer(Modifier.weight(1f))
-                        UserMessage(
-                            message.content,
-                            Modifier
-                                .widthIn(max = maxWidthFraction)
-                        )
-                    } else {
-                        FriendMessage(
-                            message.content,
-                            Modifier
-                                .widthIn(max = maxWidthFraction)
-                        )
-                        Spacer(Modifier.weight(1f))
+            items(items = messages,
+//                key = { message -> message.id ?: 0 }
+            ) { messageUiModel ->
+                when(messageUiModel) {
+                    is MessageUiModel.Chat -> {
+                        Message(messageUiModel, maxWidthFraction)
+                    }
+                    is MessageUiModel.TimeSeparator -> {
+                        Text("${messageUiModel.day} ${messageUiModel.time}")
                     }
                 }
                 Spacer(Modifier.height(12.dp))
