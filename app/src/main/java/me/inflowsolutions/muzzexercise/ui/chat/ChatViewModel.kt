@@ -75,20 +75,34 @@ class ChatViewModel @Inject constructor(
     private fun initViewModelState() {
         viewModelScope.launch {
             Timber.d("0--> initViewModelState")
-
-            combine(
-                messageRepository.getAllMessages(),
-                userRepository.getAllUsers()
-            ) { messages, users ->
-                ChatState(
-                    currentUser = users.firstOrNull(),
-                    recipientUser = users.getOrNull(1),
-                    messages = messages
+            userRepository.getAllUsers().collectLatest { users ->
+                val currentUser = users.firstOrNull()
+                val recipientUser = users.getOrNull(1)
+                viewModelStateFlow.value = ChatState(
+                    currentUser = currentUser,
+                    recipientUser = recipientUser,
+                    messages = emptyList()
                 )
-            }.collectLatest {
-                Timber.d("0--> chatState: $it")
-                viewModelStateFlow.value = it
+                messageRepository.getAllMessages().collectLatest { messages ->
+                    viewModelStateFlow.update {
+                        it.copy(messages = messages)
+                    }
+                }
             }
+
+//            combine(
+//                messageRepository.getAllMessages(),
+//                userRepository.getAllUsers()
+//            ) { messages, users ->
+//                ChatState(
+//                    currentUser = users.firstOrNull(),
+//                    recipientUser = users.getOrNull(1),
+//                    messages = messages
+//                )
+//            }.collectLatest {
+//                Timber.d("0--> chatState: $it")
+//                viewModelStateFlow.value = it
+//            }
         }
     }
 
@@ -113,11 +127,10 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun switchUser() {
-        val currentState = viewModelStateFlow.value
         viewModelStateFlow.update {
             it.copy(
-                currentUser = currentState.recipientUser,
-                recipientUser = currentState.currentUser
+                currentUser = it.recipientUser,
+                recipientUser = it.currentUser
             )
         }
     }
