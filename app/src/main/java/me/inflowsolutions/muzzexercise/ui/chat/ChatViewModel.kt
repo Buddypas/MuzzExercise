@@ -65,6 +65,8 @@ class ChatViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val viewModelState = MutableStateFlow(ChatState())
+    private val currentUserId: Int?
+        get() = viewModelState.value.currentUser?.id
 
     val uiState: StateFlow<ChatUiState> by lazy {
         viewModelState
@@ -99,7 +101,7 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 Message(
                     content = text,
-                    senderId = viewModelState.value.currentUser?.id ?: 0,
+                    senderId = currentUserId ?: 0,
                     sentAt = Clock.System.now()
                 )
             }.mapCatching { message ->
@@ -131,17 +133,24 @@ class ChatViewModel @Inject constructor(
                     MessageUiModel.TimeSeparator.fromLocalDateTime(currentDateTime)
                 )
             }
-            messageUiModelList.add(message.toChat())
+            val hasTail = when {
+                index == this.lastIndex -> true
+                this.getOrNull(index + 1)?.senderId != (currentUserId ?: 0) -> true
+                else -> prevTime?.let {
+                    currentTime.minus(it).inWholeSeconds > 20
+                } ?: false
+            }
+            messageUiModelList.add(message.toChat(hasTail))
         }
         return messageUiModelList
     }
 
-    private fun Message.toChat(): MessageUiModel.Chat =
+    private fun Message.toChat(hasTail: Boolean): MessageUiModel.Chat =
         MessageUiModel.Chat(
             content = content,
             time = sentAt.toLocalDateTime(TimeZone.currentSystemDefault()).time.toString(),
-            isMine = senderId == viewModelState.value.currentUser?.id,
-            hasTail = false
+            isMine = senderId == currentUserId,
+            hasTail = hasTail
         )
 
     // TODO: Create mapper
