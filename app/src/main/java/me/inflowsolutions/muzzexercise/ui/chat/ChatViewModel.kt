@@ -78,6 +78,8 @@ class ChatViewModel @Inject constructor(
         Timber.d("0--> initViewModelState")
         val currentUser = userRepository.getUserById(defaultCurrentUserId)
         val recipientUser = userRepository.getUserById(defaultOtherUserId)
+        Timber.d("0--> currentUser: $currentUser, recipientUser: $recipientUser")
+
         val messages = messageRepository.getAllMessages()
         val state = ChatState(
             currentUser = currentUser,

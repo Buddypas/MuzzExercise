@@ -9,6 +9,4 @@ import me.inflowsolutions.muzzexercise.domain.model.User
 fun UserDto.toUser(): User = User(id, name, imageUrl)
 
 fun MessageDto.toMessage(): Message =
-    Message(
-        id, content, senderId, Instant.fromEpochMilliseconds(timestamp)
-    )
+    Message(id, content, senderId, Instant.fromEpochMilliseconds(timestamp))

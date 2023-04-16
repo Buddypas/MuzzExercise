@@ -37,14 +37,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.RoomDatabase
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
+import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatActivity : ComponentActivity() {
+//    @Inject
+//    lateinit var db: RoomDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        Timber.d("0--> db: $db")
         setContent {
             MuzzExerciseTheme {
                 ChatScreen()

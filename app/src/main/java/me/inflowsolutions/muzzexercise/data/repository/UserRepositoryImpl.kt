@@ -10,6 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class UserRepositoryImpl @Inject constructor(
     private val db: MuzzExerciseDatabase,
+//    private val roomCallback: MuzzExerciseDatabase.RoomCallback
 ) : UserRepository {
-    override suspend fun getUserById(id: Int): User = db.usersDao().getUserById(id).toUser()
+    override suspend fun getUserById(id: Int): User? = db.usersDao().getUserById(id)?.toUser()
 }

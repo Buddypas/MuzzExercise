@@ -24,14 +24,14 @@ import javax.inject.Singleton
 @Module
 object DataModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideRoomCallback(
-//        database: Provider<MuzzExerciseDatabase>,
-//        @ApplicationScope applicationScope: CoroutineScope
-//    ): MuzzExerciseDatabase.RoomCallback {
-//        return MuzzExerciseDatabase.RoomCallback(database, applicationScope)
-//    }
+    @Provides
+    @Singleton
+    fun provideRoomCallback(
+        database: Provider<MuzzExerciseDatabase>,
+        @ApplicationScope applicationScope: CoroutineScope
+    ): MuzzExerciseDatabase.RoomCallback {
+        return MuzzExerciseDatabase.RoomCallback(database, applicationScope)
+    }
 
     @Provides
     @Singleton

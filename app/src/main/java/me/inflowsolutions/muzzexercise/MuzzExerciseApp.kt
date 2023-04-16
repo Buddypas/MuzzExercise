@@ -8,15 +8,15 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
-@AndroidEntryPoint
+//@AndroidEntryPoint
 class MuzzExerciseApp : Application() {
-    @Inject
-    lateinit var db: MuzzExerciseDatabase
+//    @Inject
+//    lateinit var db: MuzzExerciseDatabase
 
     override fun onCreate() {
         super.onCreate()
 
-        Timber.d("0--> MuzzExerciseDatabase: $db")
+//        Timber.d("0--> MuzzExerciseDatabase: $db")
 
         // Initialize timber
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
