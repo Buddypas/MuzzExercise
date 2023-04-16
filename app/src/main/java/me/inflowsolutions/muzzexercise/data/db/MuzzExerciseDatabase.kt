@@ -17,7 +17,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
-
 @Database(entities = [UserDto::class, MessageDto::class], version = 1, exportSchema = false)
 abstract class MuzzExerciseDatabase : RoomDatabase() {
     abstract fun usersDao(): UsersDao
@@ -27,7 +26,7 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
         private val database: Provider<MuzzExerciseDatabase>,
         @ApplicationScope private val applicationScope: CoroutineScope,
     ) : RoomDatabase.Callback() {
-        val prePopulationDeferred = CompletableDeferred<Unit>()
+//        val prePopulationDeferred = CompletableDeferred<Unit>()
 
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
@@ -46,7 +45,7 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
                     ),
                 )
                 Timber.d("0--> inserted")
-                prePopulationDeferred.complete(Unit)
+//                prePopulationDeferred.complete(Unit)
             }
         }
     }

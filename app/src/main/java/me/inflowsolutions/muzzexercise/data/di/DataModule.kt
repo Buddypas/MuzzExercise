@@ -9,7 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import me.inflowsolutions.muzzexercise.data.db.CurrentUserDataStore
 import me.inflowsolutions.muzzexercise.data.db.MuzzExerciseDatabase
 import me.inflowsolutions.muzzexercise.data.db.dao.MessagesDao
 import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
@@ -25,14 +24,14 @@ import javax.inject.Singleton
 @Module
 object DataModule {
 
-    @Provides
-    @Singleton
-    fun provideRoomCallback(
-        database: Provider<MuzzExerciseDatabase>,
-        @ApplicationScope applicationScope: CoroutineScope
-    ): MuzzExerciseDatabase.RoomCallback {
-        return MuzzExerciseDatabase.RoomCallback(database, applicationScope)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideRoomCallback(
+//        database: Provider<MuzzExerciseDatabase>,
+//        @ApplicationScope applicationScope: CoroutineScope
+//    ): MuzzExerciseDatabase.RoomCallback {
+//        return MuzzExerciseDatabase.RoomCallback(database, applicationScope)
+//    }
 
     @Provides
     @Singleton
@@ -65,11 +64,16 @@ object DataModule {
     @Provides
     fun provideUserRepository(
         database: MuzzExerciseDatabase,
-        currentUserDataStore: CurrentUserDataStore,
+//        currentUserDataStore: CurrentUserDataStore,
         roomCallback: MuzzExerciseDatabase.RoomCallback,
         @ApplicationScope applicationScope: CoroutineScope,
     ): UserRepository =
-        UserRepositoryImpl(database, currentUserDataStore, roomCallback,applicationScope)
+        UserRepositoryImpl(
+            database,
+//            currentUserDataStore,
+//            roomCallback,
+//            applicationScope
+        )
 
     @ApplicationScope
     @Provides

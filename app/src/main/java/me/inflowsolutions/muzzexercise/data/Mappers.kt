@@ -6,9 +6,9 @@ import me.inflowsolutions.muzzexercise.data.db.entity.UserDto
 import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.model.User
 
-suspend fun UserDto.toUser(): User = User(id, name, imageUrl)
+fun UserDto.toUser(): User = User(id, name, imageUrl)
 
-suspend fun MessageDto.toMessage(): Message =
+fun MessageDto.toMessage(): Message =
     Message(
         id, content, senderId, Instant.fromEpochMilliseconds(timestamp)
     )

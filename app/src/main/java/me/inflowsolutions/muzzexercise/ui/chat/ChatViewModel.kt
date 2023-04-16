@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
@@ -48,7 +49,6 @@ class ChatViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userRepository.initCurrentUser()
             initViewModelState()
             collectEvents()
         }
@@ -75,20 +75,16 @@ class ChatViewModel @Inject constructor(
     }
 
     private suspend fun initViewModelState() {
-        combine(
-            messageRepository.getAllMessages(),
-            userRepository.getUsersFlow()
-        ) { messages, currentUserState ->
-            Timber.d("0--> messages: $messages")
-            Timber.d("0--> currentUserState: $currentUserState")
-            ChatState(
-                currentUser = currentUserState.currentUser,
-                recipientUser = currentUserState.otherUser,
-                messages = messages
-            )
-        }.collectLatest {
-            viewModelStateFlow.value = it
-        }
+        Timber.d("0--> initViewModelState")
+        val currentUser = userRepository.getUserById(defaultCurrentUserId)
+        val recipientUser = userRepository.getUserById(defaultOtherUserId)
+        val messages = messageRepository.getAllMessages()
+        val state = ChatState(
+            currentUser = currentUser,
+            recipientUser = recipientUser,
+            messages = messages
+        )
+        viewModelStateFlow.value = state
     }
 
     private suspend fun collectEvents() {
@@ -110,8 +106,12 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun switchUser() {
-        viewModelScope.launch {
-            userRepository.switchUser()
+        val currentState = viewModelStateFlow.value
+        viewModelStateFlow.update {
+            it.copy(
+                currentUser = currentState.recipientUser,
+                recipientUser = currentState.currentUser
+            )
         }
     }
 
@@ -155,4 +155,9 @@ class ChatViewModel @Inject constructor(
             isMine = senderId == currentUserId,
             hasTail = hasTail
         )
+
+    private companion object {
+        const val defaultCurrentUserId: Int = 1
+        const val defaultOtherUserId: Int = 2
+    }
 }

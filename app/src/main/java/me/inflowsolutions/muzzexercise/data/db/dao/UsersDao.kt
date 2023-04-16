@@ -12,5 +12,5 @@ interface UsersDao {
     suspend fun insertAll(vararg categories: UserDto)
 
     @Query("SELECT * FROM users WHERE id=:userId")
-    suspend fun getUserById(userId: Int): UserDto?
+    suspend fun getUserById(userId: Int): UserDto
 }

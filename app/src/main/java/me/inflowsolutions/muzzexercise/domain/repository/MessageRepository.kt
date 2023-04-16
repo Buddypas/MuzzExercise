@@ -4,6 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import me.inflowsolutions.muzzexercise.domain.model.Message
 
 interface MessageRepository {
-    fun getAllMessages(): Flow<List<Message>>
+    suspend fun getAllMessages(): List<Message>
     suspend fun sendMessage(message: Message)
 }

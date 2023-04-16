@@ -15,10 +15,8 @@ class MessageRepositoryImpl(
     private val db: MuzzExerciseDatabase,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : MessageRepository {
-    override fun getAllMessages(): Flow<List<Message>> =
-        db.messagesDao().getAllMessages().map { messageDtoList ->
-            messageDtoList.map { it.toMessage() }
-        }
+    override suspend fun getAllMessages(): List<Message> =
+        db.messagesDao().getAllMessages().map { it.toMessage() }
 
     override suspend fun sendMessage(message: Message) {
         withContext(ioDispatcher) {
