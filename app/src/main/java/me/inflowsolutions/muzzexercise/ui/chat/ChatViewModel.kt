@@ -77,7 +77,6 @@ class ChatViewModel @Inject constructor(
     private fun initViewModelState() {
         viewModelScope.launch {
             userRepository.getAllUsers()
-                .take(1)
                 .collectLatest { users ->
                     val currentUser = users.firstOrNull()
                     val recipientUser = users.lastOrNull()

@@ -51,6 +51,7 @@ fun MessageInputField(onSendClick: (String) -> Unit, modifier: Modifier = Modifi
             OutlinedTextField(
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 shape = CircleShape,
+                maxLines = 1,
                 placeholder = {
                     Text(
                         "Type your message here",
@@ -59,7 +60,8 @@ fun MessageInputField(onSendClick: (String) -> Unit, modifier: Modifier = Modifi
                 },
                 value = fieldText,
                 onValueChange = { fieldText = it },
-                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                modifier = Modifier.weight(1f)
             )
             Spacer(Modifier.width(24.dp))
             SendButton(
