@@ -137,7 +137,6 @@ fun MuzzAppBar(
                 )
             }
         },
-//        backgroundColor = MaterialTheme.colorScheme.background,
         modifier = modifier.height(56.dp),
     )
 }
