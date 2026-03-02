@@ -23,7 +23,7 @@ import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import me.inflowsolutions.muzzexercise.ui.mvi.BaseViewModel
-import timber.log.Timber
+
 import javax.inject.Inject
 
 // TODO: Extract strings

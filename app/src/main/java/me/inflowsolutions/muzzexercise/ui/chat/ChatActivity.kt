@@ -41,7 +41,7 @@ import androidx.room.RoomDatabase
 import coil.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
-import timber.log.Timber
+
 import javax.inject.Inject
 
 @AndroidEntryPoint

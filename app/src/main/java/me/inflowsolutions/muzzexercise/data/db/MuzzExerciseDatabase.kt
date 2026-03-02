@@ -13,7 +13,7 @@ import me.inflowsolutions.muzzexercise.data.db.dao.UsersDao
 import me.inflowsolutions.muzzexercise.data.db.entity.MessageDto
 import me.inflowsolutions.muzzexercise.data.db.entity.UserDto
 import me.inflowsolutions.muzzexercise.data.di.ApplicationScope
-import timber.log.Timber
+
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -45,7 +45,6 @@ abstract class MuzzExerciseDatabase : RoomDatabase() {
                         imageUrl = "https://media.istockphoto.com/id/1311858467/photo/head-shot-portrait-attractive-young-indian-woman-looking-at-camera.jpg?s=612x612&w=0&k=20&c=0QWC0t9uc6tptvQkWZxlFKK6hsnOxQBCobTfgkuNbLA="
                     ),
                 )
-                Timber.d("0--> inserted")
             }
         }
     }
