@@ -1,6 +1,6 @@
 package me.inflowsolutions.muzzexercise.domain.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Message(
     val id: Int? = null,

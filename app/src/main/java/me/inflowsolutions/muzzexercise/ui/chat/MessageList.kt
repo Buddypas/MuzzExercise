@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -56,7 +56,8 @@ fun ColumnScope.MessageBubbleContent(
     )
     if (showTail)
         Icon(
-            Icons.Filled.DoneAll,
+//            Icons.Filled.DoneAll,
+            Icons.Filled.Done,
             tint = Color.Green,
             contentDescription = "Delivered",
             modifier = Modifier

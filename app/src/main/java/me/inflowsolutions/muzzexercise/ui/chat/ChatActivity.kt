@@ -15,34 +15,32 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.RoomDatabase
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import dagger.hilt.android.AndroidEntryPoint
 import me.inflowsolutions.muzzexercise.ui.theme.MuzzExerciseTheme
-
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatActivity : ComponentActivity() {
@@ -89,6 +87,7 @@ fun ChatScreen(viewModel: ChatViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MuzzAppBar(
     recipientName: String,
@@ -122,7 +121,7 @@ fun MuzzAppBar(
         navigationIcon = {
             IconButton(onClick = { activity?.finish() }) {
                 Icon(
-                    Icons.Outlined.ArrowBackIosNew,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     tint = MaterialTheme.colorScheme.primary,
                     contentDescription = "Navigate up",
                     modifier = Modifier.height(36.dp)
@@ -132,13 +131,13 @@ fun MuzzAppBar(
         actions = {
             IconButton(onClick = { onBackClick() }) {
                 Icon(
-                    Icons.Outlined.MoreHoriz,
+                    Icons.Outlined.MoreVert,
                     tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = "Switch user",
                 )
             }
         },
-        backgroundColor = MaterialTheme.colorScheme.background,
+//        backgroundColor = MaterialTheme.colorScheme.background,
         modifier = modifier.height(56.dp),
     )
 }

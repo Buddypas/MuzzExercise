@@ -16,15 +16,14 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.inflowsolutions.muzzexercise.domain.model.Message
 import me.inflowsolutions.muzzexercise.domain.repository.MessageRepository
 import me.inflowsolutions.muzzexercise.domain.repository.UserRepository
 import me.inflowsolutions.muzzexercise.ui.mvi.BaseViewModel
-
 import javax.inject.Inject
+import kotlin.time.Clock
 
 // TODO: Extract strings
 @HiltViewModel
